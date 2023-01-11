@@ -3,12 +3,13 @@ using System.Drawing;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Net.NetworkInformation;
 
 namespace hiveTools
 {
     class StatChecker
     {
-        public static void print(string str)
+        public static void print(string str) // lets not talk about this
         {
             Console.WriteLine(str);
         }
@@ -57,6 +58,63 @@ namespace hiveTools
         //     string json = (string)JArray.Parse(data);
         //     print(json);
         // }
+        public static void br()
+        {
+            Console.WriteLine(" ");
+        }
+        public static void Uptime(string address)
+        {
+            try
+            {
+                Ping susPing = new Ping();
+                PingReply response = susPing.Send(address, 1000);
+                if (response != null)
+                {
+                    br();
+                    Console.Write("Ping: ", Color.Blue);
+                    Console.Write(response.RoundtripTime, Color.Green);
+                    Console.WriteLine("ms", Color.Green);
+                    br();
+                    Console.Write("Status: ", Color.Blue); 
+                    Console.WriteLine(response.Status, Color.Green);
+                    Console.Write("Address: ", Color.Blue); 
+                    Console.WriteLine(response.Address, Color.Green);
+                }
+            }
+            catch
+            {
+                Console.WriteLine("\nUnable to ping!", Color.Red);
+            }
+            print("\nPress any key to go back.");
+            Console.ReadKey();
+        }
+        public static string selectRegion(string logo)
+        {
+            Console.Clear();
+            Console.WriteLine(logo, Color.DarkRed);
+            print("What region are you on? (NA/EU/AS)");
+            string region = Console.ReadLine();
+            if (region == "NA")
+            {
+                return "ca.hivebedrock.network";
+            }
+            else if (region == "EU")
+            {
+                return "fr.hivebedrock.network";
+            }
+            else if (region == "AS")
+            {
+                return "sg.hivebedrock.network";
+            }
+            else if (region == "AU")
+            {
+                return "au.hivebedrock.network";
+            }
+            else
+            {
+                return "Invalid Region! (NA/EU/AS)";
+            }
+        }
         static void Main()
         {
         start:
@@ -70,6 +128,7 @@ namespace hiveTools
             createOption("1", "Check Player Stats");
             createOption("2", "Check Leaderboard");
             createOption("3", "Check Ping");
+            br();
             createOption("10", "Exit");
 
             string input = Console.ReadLine();
@@ -80,7 +139,7 @@ namespace hiveTools
                 string username = Console.ReadLine();
                 if (username == "")
                 {
-                    Console.WriteLine("Please enter a username");
+                    Console.WriteLine("Please enter a username: ");
                     Console.ReadLine();
                     return;
                 }
@@ -107,16 +166,18 @@ namespace hiveTools
             }
             if (input == "3")
             {
-                print("What region are you on? (NA/EU/AS)");
-                string region = Console.ReadLine();
-                if (region.Trim() != "NA" || region.Trim() != "EU" || region.Trim() != "AS")
-                {
-                    print("Invalid region. (NA/EU/AS");
-                }
+                Uptime(selectRegion(logo));
+                goto start;
             }
             if (input == "10")
             {
                 Environment.Exit(0);
+            }
+            else
+            {
+                print("Invalid key!");
+                Thread.Sleep(1000);
+                goto start;
             }
         }
     }
